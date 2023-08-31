@@ -1,0 +1,8 @@
+fastapi
+mangum
+uvicorn
+langchain
+boto3
+faiss-cpu
+numpy
+sentence_transformers
