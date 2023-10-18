@@ -102,7 +102,7 @@ def _init(req: Request):
     elif _vector_db is not None:
         logger.info(f"seems like vector db already exists...")
 
-    # just like the vector db the sagemaker endpoint used for
+    # just like the vector db the Bedrock endpoint used for
     # text generation is also global and shared across invocations
     # if possible
     global _br_llm
