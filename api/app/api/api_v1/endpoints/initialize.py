@@ -129,7 +129,7 @@ def setup_sagemaker_endpoint_for_text_generation(req: Request, region: str = "us
     return sm_llm
 
 def setup_bedrock_endpoint(req: Request, region: str = "us-east-1") -> Callable:
-    bedrock_client = get_bedrock_client(region=region, runTime=True)
+    bedrock_client = get_bedrock_client(region=region, runtime=True)
     br_llm = Bedrock(model_id="anthropic.claude-v2", client=bedrock_client, model_kwargs={'max_tokens_to_sample':200})
 
     return br_llm
