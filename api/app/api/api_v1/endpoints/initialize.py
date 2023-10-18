@@ -1,8 +1,9 @@
 import os
 import json
 import boto3
+from botocore.config import Config
 import logging
-from typing import List, Callable
+from typing import List, Callable, Optional
 from urllib.parse import urlparse
 from langchain.vectorstores import FAISS
 from langchain.embeddings import HuggingFaceEmbeddings
@@ -11,8 +12,8 @@ from langchain.llms.sagemaker_endpoint import SagemakerEndpoint
 from langchain.llms.sagemaker_endpoint import LLMContentHandler
 from langchain.llms.sagemaker_endpoint import ContentHandlerBase
 from langchain.llms.bedrock import Bedrock
-from utils import bedrock
 from .fastapi_request import Request
+
 
 logger = logging.getLogger(__name__)
 
@@ -30,6 +31,43 @@ class ContentHandlerForTextGeneration(LLMContentHandler):
     def transform_output(self, output: bytes) -> str:
         response_json = json.loads(output.read().decode("utf-8"))
         return response_json[0]["generation"]["content"]
+
+def get_bedrock_client(
+    region: Optional[str] = "us-east-1",
+    runtime: Optional[bool] = True,
+):
+    if region is None:
+        target_region = os.environ.get("AWS_REGION", os.environ.get("AWS_DEFAULT_REGION"))
+    else:
+        target_region = region
+
+    print(f"Create new client\n  Using region: {target_region}")
+    session_kwargs = {"region_name": target_region}
+    client_kwargs = {**session_kwargs}
+
+    retry_config = Config(
+        region_name=target_region,
+        retries={
+            "max_attempts": 10,
+            "mode": "standard",
+        },
+    )
+    session = boto3.Session(**session_kwargs)
+
+    if runtime:
+        service_name='bedrock-runtime'
+    else:
+        service_name='bedrock'
+
+    bedrock_client = session.client(
+        service_name=service_name,
+        config=retry_config,
+        **client_kwargs
+    )
+
+    print("boto3 Bedrock client successfully created!")
+    print(bedrock_client._endpoint)
+    return bedrock_client
 
 def load_vector_db_faiss(vectordb_s3_path: str, vectordb_local_path: str, region: str) -> FAISS:
     os.makedirs(vectordb_local_path, exist_ok=True)
@@ -91,7 +129,7 @@ def setup_sagemaker_endpoint_for_text_generation(req: Request, region: str = "us
     return sm_llm
 
 def setup_bedrock_endpoint(req: Request, region: str = "us-east-1") -> Callable:
-    bedrock_client = bedrock.get_bedrock_client(region=region, runTime=True)
+    bedrock_client = get_bedrock_client(region=region, runTime=True)
     br_llm = Bedrock(model_id="anthropic.claude-v2", client=bedrock_client, model_kwargs={'max_tokens_to_sample':200})
 
     return br_llm
