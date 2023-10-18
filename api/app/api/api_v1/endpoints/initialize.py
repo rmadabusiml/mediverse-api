@@ -11,6 +11,7 @@ from langchain.llms.sagemaker_endpoint import SagemakerEndpoint
 from langchain.llms.sagemaker_endpoint import LLMContentHandler
 from langchain.llms.sagemaker_endpoint import ContentHandlerBase
 from langchain.llms.bedrock import Bedrock
+from utils import bedrock
 from .fastapi_request import Request
 
 logger = logging.getLogger(__name__)
