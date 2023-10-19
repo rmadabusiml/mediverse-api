@@ -94,7 +94,7 @@ def retrieval_qa_chain(llm, prompt, db):
     print("---------------------")
     qa_chain = RetrievalQA.from_chain_type(llm=llm,
                                        chain_type='stuff',
-                                       retriever=db.as_retriever(search_type="similarity", search_kwargs={'k': 4}),
+                                       retriever=db.as_retriever(search_type="mmr", search_kwargs={'k': 10}),
                                        return_source_documents=True,
                                        chain_type_kwargs={'prompt': prompt}
                                        )
