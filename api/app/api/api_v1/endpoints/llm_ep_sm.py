@@ -41,7 +41,6 @@ def _init(req: Request):
     # created once across multiple lambda invocations, if possible
     global _vector_db
     global _current_vectordb_type
-    #vectordb_s3_path = "s3://dml-dev-deployment/raghu/health-universe/db_faiss/"
     
     if _vector_db is None:
         # _vector_db = load_vector_db_faiss(vectordb_s3_path,
