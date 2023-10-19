@@ -2,7 +2,9 @@ fastapi
 mangum
 uvicorn
 langchain
-boto3
+awscli>=1.29.57
+botocore>=1.31.57
+boto3>=1.28.57
 faiss-cpu
 numpy
 sentence_transformers
