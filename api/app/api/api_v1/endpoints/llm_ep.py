@@ -143,6 +143,7 @@ def retrieval_qa_chain(llm, prompt, db):
 @router.post("/rag")
 async def rag_handler(req: Request) -> Dict[str, Any]:
     # dump the received request for debugging purposes
+    logger.info("boto3 version ", boto3.__version__)
     logger.info(f"req={req}")
 
     # initialize vector db and Sagemaker Endpoint
